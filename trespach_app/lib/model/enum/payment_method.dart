@@ -1,1 +1,1 @@
-enum PaymentMethod { DEBITO, CREDITO, PIX, DINHEIRO }
+enum PaymentMethod { debito, credito, pix, dinheiro }
