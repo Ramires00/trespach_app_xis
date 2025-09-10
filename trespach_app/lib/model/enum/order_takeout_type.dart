@@ -1,0 +1,1 @@
+enum OrderTakeoutType { RETIRADA, ENTREGA }
