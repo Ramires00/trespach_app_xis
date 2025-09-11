@@ -1,3 +1,7 @@
+import 'package:trespach_app/model/additional.dart';
+
+typedef JSON = Map<String, dynamic>;
+
 class Product {
   Product({
     required this.name,
@@ -6,16 +10,26 @@ class Product {
     this.additionals,
     this.image,
     required this.notes,
-    required this.quantity,
+    this.quantity,
   });
 
   final String name;
   final String description;
   final num price;
-  final dynamic additionals;
+  final List<Additional>? additionals;
   final String notes;
-  final int quantity;
+  final int? quantity;
   final String? image;
+
+  factory Product.fromJson(JSON json) {
+    return Product(
+      name: json['name'],
+      description: json['description'],
+      price: json['price'],
+      notes: json['notes'],
+      quantity: json['quantity'],
+    );
+  }
 }
 
 // Produto (Lanche, bebida, doce (sobremesa))

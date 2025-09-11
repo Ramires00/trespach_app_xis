@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:trespach_app/controller/home_controller.dart';
 import 'package:trespach_app/view/product_detail.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
+
+  final HomeController homeController = HomeController();
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -13,16 +16,32 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Trespach Lanches')),
-      body: ListView.builder(
-        itemBuilder: (context, index) => ListTile(
-          leading: Image.network(
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTePsTtyBilWb9sjgUIALUbIDvCYpNTQEzJxA&s',
-          ),
-          title: Text('Nome do Produto'),
-          subtitle: Text('Valor do produto'),
-          onTap: () => ProductDetail(),
-        ),
-        itemCount: 5,
+      body: FutureBuilder(
+        future: widget.homeController.getProducts(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData) {
+            return ListView.builder(
+              itemBuilder: (context, index) => ListTile(
+                leading: Image.network(
+                  snapshot.data?[index].image ?? 'ERRO',
+                  errorBuilder: (context, error, stackTrace) =>
+                      Icon(Icons.fastfood),
+                ),
+                title: Text(snapshot.data?[index].name ?? 'ERRO'),
+                subtitle: Text((snapshot.data?[index].price ?? 0).toString()),
+                onTap: () => ProductDetail(),
+              ),
+              itemCount: snapshot.data?.length ?? 0,
+            );
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text("Ocorreu um erro."));
+          }
+
+          return Center(child: CircularProgressIndicator());
+        },
       ),
     );
   }
