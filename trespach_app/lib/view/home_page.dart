@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trespach_app/view/product_detail.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,20 +12,21 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text('Trespach Lanches')),
       body: ListView.builder(
         itemBuilder: (context, index) => ListTile(
           leading: Image.network(
-            'https://docs.flutter.dev/assets/images/dash/dash-fainting.gif',
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTePsTtyBilWb9sjgUIALUbIDvCYpNTQEzJxA&s',
           ),
-          title: Text('Xis saas - ${2.00}'),
-          subtitle: Text('descricao'),
+          title: Text('Nome do Produto'),
+          subtitle: Text('Valor do produto'),
+          onTap: () => ProductDetail(),
         ),
-        itemCount: 2,
+        itemCount: 5,
       ),
     );
   }
 }
-
 
 // Produto (Lanche, bebida, doce (sobremesa))
 //   - Nome (String) OK
@@ -32,5 +34,3 @@ class _HomePageState extends State<HomePage> {
 //   - Valor (número)
 //   - Adicionais (se houver) (Lista de adicionais)
 //   - Observação (String)
-//   - Quantidade (número)
-//   - Foto (String - link http da foto) OK

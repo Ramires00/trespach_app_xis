@@ -1,0 +1,26 @@
+import 'package:flutter/material.dart';
+
+class ProductDetail extends StatefulWidget {
+  const ProductDetail({super.key});
+
+  @override
+  State<ProductDetail> createState() => _ProductDetailState();
+}
+
+class _ProductDetailState extends State<ProductDetail> {
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Column(
+        children: [
+          Text('Imagem'), // imagem
+          Text('Nome'), // nome do produto
+          Text('Descrição'), // descricao do produto
+          Text('Adicionais'), // Adicionais...
+          Text('Observação'),
+          Text('Quantidade'),
+        ],
+      ),
+    );
+  }
+}
