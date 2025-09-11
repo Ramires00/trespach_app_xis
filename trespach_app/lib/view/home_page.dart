@@ -20,22 +20,40 @@ class _HomePageState extends State<HomePage> {
       body: FutureBuilder(
         future: widget.homeController.getProducts(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done &&
-              snapshot.hasData) {
+          final envelopeDeDados = snapshot;
+          final estadoDaConexao = envelopeDeDados.connectionState;
+          final possuiDados = envelopeDeDados.hasData;
+          final produtos = envelopeDeDados.data;
+          if (estadoDaConexao == ConnectionState.done && possuiDados) {
             return ListView.builder(
-              itemBuilder: (context, index) => ListTile(
-                leading: Image.network(
-                  snapshot.data?[index].image ?? 'ERRO',
-                  errorBuilder: (context, error, stackTrace) =>
-                      Icon(Icons.fastfood),
-                ),
-                title: Text(snapshot.data?[index].name ?? 'ERRO'),
-                subtitle: Text((snapshot.data?[index].price ?? 0).toString()),
-                onTap: () => Navigator.of(context).push(
-                  CupertinoPageRoute(builder: (context) => ProductDetail()),
-                ),
-              ),
-              itemCount: snapshot.data?.length ?? 0,
+              itemBuilder: (context, index) {
+                final elementoAtualDoForLoop = index;
+
+                return ListTile(
+                  leading: Image.network(
+                    produtos?.elementAt(elementoAtualDoForLoop).image ?? 'ERRO',
+                    errorBuilder: (context, error, stackTrace) =>
+                        Icon(Icons.fastfood),
+                  ),
+                  title: Text(
+                    produtos?.elementAt(elementoAtualDoForLoop).name ?? 'ERRO',
+                  ),
+                  subtitle: Text(
+                    (produtos?.elementAt(elementoAtualDoForLoop).price ?? 0)
+                        .toString(),
+                  ),
+                  onTap: () => Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      builder: (context) => ProductDetail(
+                        produtoSelecionado: produtos?.elementAt(
+                          elementoAtualDoForLoop,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+              itemCount: produtos == null ? 0 : produtos.length,
             );
           }
 
@@ -49,10 +67,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-// Produto (Lanche, bebida, doce (sobremesa))
-//   - Nome (String) OK
-//   - Descrição (String)
-//   - Valor (número)
-//   - Adicionais (se houver) (Lista de adicionais)
-//   - Observação (String)
