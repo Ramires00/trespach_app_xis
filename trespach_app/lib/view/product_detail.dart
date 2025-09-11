@@ -13,12 +13,25 @@ class _ProductDetailState extends State<ProductDetail> {
     return Card(
       child: Column(
         children: [
-          Text('Imagem'), // imagem
+          Image.network(
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTePsTtyBilWb9sjgUIALUbIDvCYpNTQEzJxA&s',
+          ), // imagem
           Text('Nome'), // nome do produto
           Text('Descrição'), // descricao do produto
-          Text('Adicionais'), // Adicionais...
-          Text('Observação'),
+          TextButton(
+            child: Text('Adicionais'),
+            onPressed: () => ListView.builder(
+              itemBuilder: (context, index) =>
+                  ListTile(title: Text('adicionais..')),
+              itemCount: 4,
+            ),
+          ), // Adicionais... },
+          TextField(),
           Text('Quantidade'),
+          ElevatedButton(
+            child: Text('Adicionar ao Carrinho'),
+            onPressed: () => Navigator.pop(context),
+          ),
         ],
       ),
     );

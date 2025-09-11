@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:trespach_app/controller/home_controller.dart';
 import 'package:trespach_app/view/product_detail.dart';
@@ -30,7 +31,9 @@ class _HomePageState extends State<HomePage> {
                 ),
                 title: Text(snapshot.data?[index].name ?? 'ERRO'),
                 subtitle: Text((snapshot.data?[index].price ?? 0).toString()),
-                onTap: () => ProductDetail(),
+                onTap: () => Navigator.of(context).push(
+                  CupertinoPageRoute(builder: (context) => ProductDetail()),
+                ),
               ),
               itemCount: snapshot.data?.length ?? 0,
             );
