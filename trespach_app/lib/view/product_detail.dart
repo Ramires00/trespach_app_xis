@@ -11,6 +11,8 @@ class ProductDetail extends StatefulWidget {
 }
 
 class _ProductDetailState extends State<ProductDetail> {
+  int quantity = 0;
+
   @override
   Widget build(BuildContext context) {
     if (widget.produtoSelecionado == null) {
@@ -23,8 +25,8 @@ class _ProductDetailState extends State<ProductDetail> {
           Image.network(
             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTePsTtyBilWb9sjgUIALUbIDvCYpNTQEzJxA&s',
           ), // imagem
-          Text(widget.produtoSelecionado!.name), // nome do produto
-          Text(widget.produtoSelecionado!.description), // descricao do produto
+          Text(widget.produtoSelecionado!.name),
+          Text(widget.produtoSelecionado!.description),
           TextButton(
             child: Text('Adicionais'),
             onPressed: () => showDialog(
@@ -38,8 +40,9 @@ class _ProductDetailState extends State<ProductDetail> {
                       ListView.builder(
                         shrinkWrap: true,
                         itemBuilder: (context, index) =>
-                            ListTile(title: Text('adicionais..')),
-                        itemCount: 4,
+                            ListTile(title: Text('1212')),
+                        itemCount:
+                            widget.produtoSelecionado!.additionals!.length,
                       ),
                     ],
                   ),
@@ -48,10 +51,32 @@ class _ProductDetailState extends State<ProductDetail> {
             ),
           ), // Adicionais... },
           TextField(),
-          Text('Quantidade'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: Icon(Icons.remove),
+                onPressed: () {
+                  setState(() {
+                    quantity--;
+                  });
+                },
+              ),
+              Text('Quantidade: ${quantity}'),
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () {
+                  setState(() {
+                    quantity++;
+                  });
+                },
+              ),
+            ],
+          ),
           ElevatedButton(
             child: Text('Adicionar ao Carrinho'),
             onPressed: () => Navigator.pop(context),
+            // caso o xis seja selecionado, passar o valor para o cart_page.
           ),
         ],
       ),
