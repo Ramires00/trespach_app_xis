@@ -1,0 +1,1 @@
+enum LocalStorageCollections { cartProducts }

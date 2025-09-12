@@ -30,6 +30,18 @@ class Product {
       quantity: json['quantity'],
     );
   }
+
+  JSON toJson() {
+    return {
+      "name": name,
+      "description": description,
+      "price": price,
+      "additionals": additionals?.map((a) => a.toJson()).toList(),
+      "notes": notes,
+      "quantity": quantity,
+      "image": image,
+    };
+  }
 }
 
 // Produto (Lanche, bebida, doce (sobremesa))

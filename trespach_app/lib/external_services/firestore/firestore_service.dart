@@ -13,4 +13,9 @@ class FirestoreService {
 
     return data.docs.map((d) => d.data()).toList();
   }
+
+  static Future<void> createData({
+    required FirestoreCollections collection,
+    required JSON data,
+  }) => db.collection(collection.name).doc().set(data);
 }

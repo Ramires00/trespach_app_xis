@@ -1,3 +1,5 @@
+typedef JSON = Map<String, dynamic>;
+
 class Additional {
   Additional({
     required this.name,
@@ -10,6 +12,15 @@ class Additional {
   final num price;
   final int quantity;
   final int quantityLimit;
+
+  JSON toJson() {
+    return {
+      "name": name,
+      "price": price,
+      "quantity": quantity,
+      "quantityLimit": quantityLimit,
+    };
+  }
 }
 
 // Adicional
