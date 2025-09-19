@@ -1,16 +1,18 @@
+import 'package:flutter/foundation.dart';
+
 typedef JSON = Map<String, dynamic>;
 
 class Additional {
   Additional({
     required this.name,
     required this.price,
-    required this.quantity,
+    this.quantity,
     required this.quantityLimit,
   });
 
   final String name;
   final num price;
-  final int quantity;
+  final int? quantity;
   final int quantityLimit;
 
   JSON toJson() {
@@ -20,6 +22,15 @@ class Additional {
       "quantity": quantity,
       "quantityLimit": quantityLimit,
     };
+  }
+
+  factory Additional.fromJson(JSON json) {
+    return Additional(
+      name: json['name'],
+      price: json['price'],
+      quantity: json['quantity'],
+      quantityLimit: json['quantityLimit'],
+    );
   }
 }
 

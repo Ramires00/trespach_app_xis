@@ -26,6 +26,9 @@ class Product {
       name: json['name'],
       description: json['description'],
       price: json['price'],
+      additionals: json['additionals']
+          .map<Additional>((a) => Additional.fromJson(a))
+          .toList(),
       notes: json['notes'],
       quantity: json['quantity'],
     );

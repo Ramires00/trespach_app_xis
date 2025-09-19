@@ -30,14 +30,14 @@ class _HomePageState extends State<HomePage> {
       ),
       body: FutureBuilder(
         future: widget.homeController.getProducts(),
-        builder: (context, snapshot) {
+        builder: (_, snapshot) {
           final envelopeDeDados = snapshot;
           final estadoDaConexao = envelopeDeDados.connectionState;
           final possuiDados = envelopeDeDados.hasData;
           final produtos = envelopeDeDados.data;
           if (estadoDaConexao == ConnectionState.done && possuiDados) {
             return ListView.builder(
-              itemBuilder: (context, index) {
+              itemBuilder: (_, index) {
                 final elementoAtualDoForLoop = index;
 
                 return ListTile(
@@ -53,15 +53,26 @@ class _HomePageState extends State<HomePage> {
                     (produtos?.elementAt(elementoAtualDoForLoop).price ?? 0)
                         .toString(),
                   ),
-                  onTap: () => Navigator.of(context).push(
-                    CupertinoPageRoute(
-                      builder: (context) => ProductDetail(
-                        produtoSelecionado: produtos?.elementAt(
-                          elementoAtualDoForLoop,
-                        ),
-                      ),
-                    ),
-                  ),
+                  onTap: () async {
+                    final isProductAddedToCart = await Navigator.of(context)
+                        .push<bool>(
+                          CupertinoPageRoute(
+                            builder: (context) => ProductDetail(
+                              produtoSelecionado: produtos?.elementAt(
+                                elementoAtualDoForLoop,
+                              ),
+                            ),
+                          ),
+                        );
+
+                    if (isProductAddedToCart != null &&
+                        isProductAddedToCart &&
+                        context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('produto adicionado!')),
+                      );
+                    }
+                  },
                 );
               },
               itemCount: produtos == null ? 0 : produtos.length,
