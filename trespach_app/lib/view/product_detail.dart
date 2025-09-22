@@ -38,119 +38,134 @@ class _ProductDetailState extends State<ProductDetail> {
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (context) => AlertDialog(
-                    content: SizedBox(
-                      height: 400,
-                      width: 300,
-                      child: Column(
-                        children: [
-                          ListView.builder(
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) => ListTile(
-                              title: Text(
-                                widget
-                                    .produtoSelecionado!
-                                    .additionals![index]
-                                    .name,
-                              ),
-                              trailing: QuantityAdditionals(
-                                quantityLimit: widget
-                                    .produtoSelecionado!
-                                    .additionals![index]
-                                    .quantityLimit,
-                                initialQuantity:
-                                    additionalsSelected
-                                        .elementAtOrNull(index)
-                                        ?.quantity ??
-                                    0,
-                                onRemoved: () {
-                                  additionalsSelected.removeWhere(
-                                    (a) =>
-                                        a.name ==
-                                        widget
-                                            .produtoSelecionado!
-                                            .additionals![index]
-                                            .name,
-                                  );
-                                },
-                                onChanged: (additionalQuantity) {
-                                  final isAdditionalExistent =
-                                      additionalsSelected.any(
-                                        (a) =>
-                                            a.name ==
-                                            widget
-                                                .produtoSelecionado!
-                                                .additionals![index]
-                                                .name,
-                                      );
+                  builder: (context) => StatefulBuilder(
+                    builder: (context, setState) {
+                      return AlertDialog(
+                        content: SizedBox(
+                          height: 400,
+                          width: 300,
+                          child: Column(
+                            children: [
+                              ListView.builder(
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) => ListTile(
+                                  title: Text(
+                                    widget
+                                        .produtoSelecionado!
+                                        .additionals![index]
+                                        .name,
+                                  ),
+                                  trailing: NumberStepper(
+                                    quantityLimit: widget
+                                        .produtoSelecionado!
+                                        .additionals![index]
+                                        .quantityLimit,
+                                    initialQuantity:
+                                        additionalsSelected
+                                            .elementAtOrNull(index)
+                                            ?.quantity ??
+                                        0,
+                                    onRemoved: () {
+                                      setState(() {
+                                        additionalsSelected.removeWhere(
+                                          (a) =>
+                                              a.name ==
+                                              widget
+                                                  .produtoSelecionado!
+                                                  .additionals![index]
+                                                  .name,
+                                        );
+                                      });
+                                    },
+                                    onChanged: (additionalQuantity) {
+                                      final isAdditionalExistent =
+                                          additionalsSelected.any(
+                                            (a) =>
+                                                a.name ==
+                                                widget
+                                                    .produtoSelecionado!
+                                                    .additionals![index]
+                                                    .name,
+                                          );
 
-                                  if (!isAdditionalExistent && quantity >= 1) {
-                                    additionalsSelected.add(
-                                      Additional(
-                                        name: widget
-                                            .produtoSelecionado!
-                                            .additionals![index]
-                                            .name,
-                                        price: widget
-                                            .produtoSelecionado!
-                                            .additionals![index]
-                                            .price,
-                                        quantityLimit: widget
-                                            .produtoSelecionado!
-                                            .additionals![index]
-                                            .quantityLimit,
-                                        quantity: additionalQuantity,
-                                      ),
-                                    );
-                                  } else {
-                                    additionalsSelected.removeWhere(
-                                      (a) =>
-                                          a.name ==
-                                          widget
-                                              .produtoSelecionado!
-                                              .additionals![index]
-                                              .name,
-                                    );
-                                    additionalsSelected.add(
-                                      Additional(
-                                        name: widget
-                                            .produtoSelecionado!
-                                            .additionals![index]
-                                            .name,
-                                        price: widget
-                                            .produtoSelecionado!
-                                            .additionals![index]
-                                            .price,
-                                        quantityLimit: widget
-                                            .produtoSelecionado!
-                                            .additionals![index]
-                                            .quantityLimit,
-                                        quantity: additionalQuantity,
-                                      ),
-                                    );
-                                  }
-                                },
-                              ),
-                              subtitle: Text(
-                                widget
+                                      if (!isAdditionalExistent &&
+                                          quantity >= 1) {
+                                        setState(() {
+                                          additionalsSelected.add(
+                                            Additional(
+                                              name: widget
+                                                  .produtoSelecionado!
+                                                  .additionals![index]
+                                                  .name,
+                                              price: widget
+                                                  .produtoSelecionado!
+                                                  .additionals![index]
+                                                  .price,
+                                              quantityLimit: widget
+                                                  .produtoSelecionado!
+                                                  .additionals![index]
+                                                  .quantityLimit,
+                                              quantity: additionalQuantity,
+                                            ),
+                                          );
+                                        });
+                                      } else {
+                                        setState(() {
+                                          additionalsSelected.removeWhere(
+                                            (a) =>
+                                                a.name ==
+                                                widget
+                                                    .produtoSelecionado!
+                                                    .additionals![index]
+                                                    .name,
+                                          );
+                                          additionalsSelected.add(
+                                            Additional(
+                                              name: widget
+                                                  .produtoSelecionado!
+                                                  .additionals![index]
+                                                  .name,
+                                              price: widget
+                                                  .produtoSelecionado!
+                                                  .additionals![index]
+                                                  .price,
+                                              quantityLimit: widget
+                                                  .produtoSelecionado!
+                                                  .additionals![index]
+                                                  .quantityLimit,
+                                              quantity: additionalQuantity,
+                                            ),
+                                          );
+                                        });
+                                      }
+                                    },
+                                  ),
+                                  subtitle: Text(
+                                    widget
+                                        .produtoSelecionado!
+                                        .additionals![index]
+                                        .price
+                                        .toString(),
+                                  ),
+                                ),
+                                itemCount: widget
                                     .produtoSelecionado!
-                                    .additionals![index]
-                                    .price
-                                    .toString(),
+                                    .additionals!
+                                    .length,
                               ),
-                            ),
-                            itemCount:
-                                widget.produtoSelecionado!.additionals!.length,
+                              TextButton(
+                                onPressed: additionalsSelected.isEmpty
+                                    ? null
+                                    : () {
+                                        Navigator.pop(context);
+                                      },
+                                child: Text('Adicionar'),
+                              ),
+                            ],
                           ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text('Adicionar'),
-                          ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   ),
                 );
               },
@@ -161,8 +176,12 @@ class _ProductDetailState extends State<ProductDetail> {
                 hintText: 'Observação: Ex Tirar milho e ervilha.',
               ),
             ),
-            QuantityAdditionals(
-              onRemoved: () {},
+            NumberStepper(
+              onRemoved: () {
+                setState(() {
+                  quantity = 0;
+                });
+              },
               onChanged: (quantitySelected) {
                 setState(() {
                   quantity = quantitySelected;
@@ -170,26 +189,28 @@ class _ProductDetailState extends State<ProductDetail> {
               },
             ),
             ElevatedButton(
-              child: Text('Adicionar ao Carrinho'),
-              // se não for adicionado nenhum produto desabilitar o botão!
-              onPressed: () async {
-                await LocalStorage.storeJson(
-                  localStorageCollection: LocalStorageCollections.cartProducts,
-                  data: Product(
-                    name: widget.produtoSelecionado!.name,
-                    description: widget.produtoSelecionado!.description,
-                    additionals: additionalsSelected,
-                    quantity: quantity,
-                    price: widget.produtoSelecionado!.price,
-                    notes: notesController.value.text,
-                  ).toJson(),
-                );
-                additionalsSelected.clear();
+              onPressed: quantity <= 0
+                  ? null
+                  : () async {
+                      await LocalStorage.storeJson(
+                        localStorageCollection:
+                            LocalStorageCollections.cartProducts,
+                        data: Product(
+                          name: widget.produtoSelecionado!.name,
+                          description: widget.produtoSelecionado!.description,
+                          additionals: additionalsSelected,
+                          quantity: quantity,
+                          price: widget.produtoSelecionado!.price,
+                          notes: notesController.value.text,
+                        ).toJson(),
+                      );
+                      additionalsSelected.clear();
 
-                if (context.mounted) {
-                  Navigator.pop(context, true);
-                }
-              },
+                      if (context.mounted) {
+                        Navigator.pop(context, true);
+                      }
+                    },
+              child: Text('Adicionar ao Carrinho'),
               // caso o xis seja selecionado, passar o valor para o cart_page.
             ),
           ],
@@ -199,25 +220,25 @@ class _ProductDetailState extends State<ProductDetail> {
   }
 }
 
-class QuantityAdditionals extends StatefulWidget {
-  const QuantityAdditionals({
+class NumberStepper extends StatefulWidget {
+  const NumberStepper({
     required this.onChanged,
-    required this.onRemoved,
+    this.onRemoved,
     this.quantityLimit,
     this.initialQuantity = 0,
     super.key,
   });
 
   final void Function(int quantitySelected) onChanged;
-  final void Function() onRemoved;
+  final void Function()? onRemoved;
   final int? quantityLimit;
   final int initialQuantity;
 
   @override
-  State<QuantityAdditionals> createState() => _QuantityAdditionalsState();
+  State<NumberStepper> createState() => _NumberStepperState();
 }
 
-class _QuantityAdditionalsState extends State<QuantityAdditionals> {
+class _NumberStepperState extends State<NumberStepper> {
   int quantity = 0;
 
   @override
@@ -248,7 +269,7 @@ class _QuantityAdditionalsState extends State<QuantityAdditionals> {
             });
 
             if (quantity <= 0) {
-              widget.onRemoved();
+              widget.onRemoved?.call();
             } else {
               widget.onChanged(quantity);
             }

@@ -46,12 +46,3 @@ class Product {
     };
   }
 }
-
-// Produto (Lanche, bebida, doce (sobremesa))
-//   - Nome (String)
-//   - Descrição (String)
-//   - Valor (número)
-//   - Adicionais (se houver) (Lista de adicionais)
-//   - Observação (String)
-//   - Quantidade (número)
-//   - Foto (String - link http da foto)
