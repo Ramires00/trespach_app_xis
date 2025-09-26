@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:trespach_app/external_services/firestore/firestore_collections.dart';
+import 'package:trespach_app/external_services/firestore/firestore_service.dart';
 import 'package:trespach_app/external_services/localstorage/localstorage.dart';
 import 'package:trespach_app/external_services/localstorage/localstorage_collections.dart';
+import 'package:trespach_app/model/address.dart';
 import 'package:trespach_app/model/product.dart';
 
 typedef JSON = Map<String, dynamic>;
@@ -24,5 +27,24 @@ class CartController {
     );
 
     return jsonsFromCart.map((jc) => Product.fromJson(jc)).toList();
+  }
+
+  Future<List<Neighborhood>> retrieveNeighborhoods() async {
+    final data = await FirestoreService.getData(
+      collection: FirestoreCollections.neighborhoods,
+    );
+
+    final neighborhoods = data
+        .map((json) => Neighborhood.fromJson(json))
+        .toList();
+
+    return neighborhoods;
+  }
+
+  Future<void> createNewOrder(JSON json) async {
+    await FirestoreService.createData(
+      collection: FirestoreCollections.orders,
+      data: json,
+    );
   }
 }

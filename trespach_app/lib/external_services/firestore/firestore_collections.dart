@@ -1,1 +1,1 @@
-enum FirestoreCollections { products }
+enum FirestoreCollections { products, neighborhoods, orders }

@@ -16,6 +16,8 @@ dependencies:
   firebase_core: ^4.1.0
   cloud_firestore: ^6.0.1
   localstore: ^1.4.0
+  extended_masked_text: ^3.0.1
+  currency_text_input_formatter: ^2.3.0
 
 dev_dependencies:
   flutter_test:
