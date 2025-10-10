@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:trespach_app/firebase_options.dart';
 import 'package:trespach_app/view/home_page.dart';
+import 'package:trespach_app/view/widgets/error_boundary_widget.dart';
 
 Future<void> init() async {
   try {
@@ -18,5 +19,22 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await init();
-  runApp(MaterialApp(home: HomePage(), debugShowCheckedModeBanner: false));
+  runApp(
+    MaterialApp(
+      theme: ThemeData(
+        bottomSheetTheme: BottomSheetThemeData(
+          backgroundColor: Colors.transparent,
+        ),
+      ),
+      home: HomePage(),
+      debugShowCheckedModeBanner: false,
+      builder: (context, child) {
+        ErrorWidget.builder = (details) {
+          return ErrorBoundaryWidget(details: details);
+        };
+
+        return child!;
+      },
+    ),
+  );
 }

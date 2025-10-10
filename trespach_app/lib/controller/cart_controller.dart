@@ -21,6 +21,13 @@ class CartController {
     }
   }
 
+  Future<void> deleteProduct(String id) async {
+    LocalStorage.deleteJson(
+      localStorageCollection: LocalStorageCollections.cartProducts,
+      id: id,
+    );
+  }
+
   Future<List<Product>> retrieveProductsInCart() async {
     final jsonsFromCart = await LocalStorage.getAllJsons(
       localStorageCollection: LocalStorageCollections.cartProducts,

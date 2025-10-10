@@ -4,6 +4,7 @@ typedef JSON = Map<String, dynamic>;
 
 class Product {
   Product({
+    required this.id,
     required this.name,
     required this.description,
     required this.price,
@@ -13,6 +14,7 @@ class Product {
     this.quantity,
   });
 
+  final String id;
   final String name;
   final String description;
   final num price;
@@ -23,6 +25,7 @@ class Product {
 
   factory Product.fromJson(JSON json) {
     return Product(
+      id: json['id'],
       name: json['name'],
       description: json['description'],
       price: json['price'],
@@ -31,11 +34,13 @@ class Product {
           .toList(),
       notes: json['notes'],
       quantity: json['quantity'],
+      image: json['image'],
     );
   }
 
   JSON toJson() {
     return {
+      "id": id,
       "name": name,
       "description": description,
       "price": price,

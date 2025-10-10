@@ -9,7 +9,10 @@ class LocalStorage {
   static Future<void> storeJson({
     required LocalStorageCollections localStorageCollection,
     required JSON data,
-  }) async => await _db.collection(localStorageCollection.name).doc().set(data);
+  }) async => await _db
+      .collection(localStorageCollection.name)
+      .doc(data["id"])
+      .set(data);
 
   static Future<List> getAllJsons({
     required LocalStorageCollections localStorageCollection,
@@ -17,4 +20,10 @@ class LocalStorage {
     final jsons = await _db.collection(localStorageCollection.name).get();
     return jsons?.values.toList() ?? [];
   }
+
+  static Future<void> deleteJson({
+    required LocalStorageCollections localStorageCollection,
+    required String id,
+  }) async =>
+      await _db.collection(localStorageCollection.name).doc(id).delete();
 }
