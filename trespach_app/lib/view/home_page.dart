@@ -1,6 +1,7 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:trespach_app/controller/home_controller.dart';
 import 'package:trespach_app/view/cart_page.dart';
 import 'package:trespach_app/view/product_detail.dart';
@@ -45,12 +46,11 @@ class _HomePageState extends State<HomePage> {
             final possuiDados = envelopeDeDados.hasData;
             final produtos = envelopeDeDados.data;
             if (estadoDaConexao == ConnectionState.done && possuiDados) {
-              return GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              return MasonryGridView.builder(
+                gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: MediaQuery.sizeOf(context).width < 1000
                       ? 3
                       : 4,
-                  childAspectRatio: 1 / 1.5,
                 ),
                 itemBuilder: (_, index) {
                   final elementoAtualDoForLoop = index;
