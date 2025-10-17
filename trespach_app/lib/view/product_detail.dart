@@ -260,7 +260,7 @@ class _ProductDetailState extends State<ProductDetail> {
                                 Row(
                                   children: [
                                     ElevatedButton(
-                                      child: Text('selecionarR mais produtos'),
+                                      child: Text('selecionar mais produtos'),
                                       onPressed: () => Navigator.of(context)
                                           .pushAndRemoveUntil(
                                             MaterialPageRoute(

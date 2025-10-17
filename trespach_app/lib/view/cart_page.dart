@@ -1,4 +1,5 @@
 import 'package:extended_masked_text/extended_masked_text.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:trespach_app/controller/cart_controller.dart';
@@ -8,6 +9,7 @@ import 'package:trespach_app/model/enum/order_takeout_type.dart';
 import 'package:trespach_app/model/enum/payment_method.dart';
 import 'package:trespach_app/model/order.dart';
 import 'package:trespach_app/model/product.dart';
+import 'package:trespach_app/view/home_page.dart';
 import 'package:trespach_app/view/widgets/scaffold_constraint.dart';
 
 num calculateAdditionals(List<Additional>? additionals) {
@@ -61,6 +63,19 @@ class _ShoppingCartState extends State<ShoppingCart> {
 
   num total = 0;
   num subtotal = 0;
+  bool isLoadingCart = false;
+  bool hasProductsInCart = false;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final products = await cartController.retrieveProductsInCart();
+      setState(() {
+        hasProductsInCart = products.isNotEmpty;
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,82 +88,91 @@ class _ShoppingCartState extends State<ShoppingCart> {
           children: [
             Column(
               children: [
-                Text('subtotal: $subtotal'),
-                if (order != null &&
-                    order!.address != null &&
-                    order?.address!.deliveryTax != null)
-                  Text('Valor da tele: ${order?.address!.deliveryTax}'),
-                Text('total do pedido: $total'),
+                if (total > 0) ...[
+                  Text('subtotal: $subtotal'),
+                  if (order != null &&
+                      order!.address != null &&
+                      order?.address!.deliveryTax != null)
+                    Text('Valor da tele: ${order?.address!.deliveryTax}'),
+                  Text('total do pedido: $total'),
+                ],
               ],
             ),
 
+            //editar
             Row(
               children: [
-                TextButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => StatefulBuilder(
-                        builder: (context, setState) => AddressDialog(
-                          takeoutType: OrderTakeoutType.retirada,
+                if (hasProductsInCart) ...[
+                  TextButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => StatefulBuilder(
+                          builder: (context, setState) => AddressDialog(
+                            takeoutType: OrderTakeoutType.retirada,
 
-                          onSubmit: (orderFromDialog) {
-                            setState(() {
-                              order = Order(
-                                createdAt: orderFromDialog.createdAt,
-                                customerName: orderFromDialog.customerName,
-                                orderTakeoutType: OrderTakeoutType.retirada,
-                                orderTotal: orderFromDialog.orderTotal,
-                                paymentMethod: orderFromDialog.paymentMethod,
-                                phoneNumber: orderFromDialog.phoneNumber,
-                                products: orderFromDialog.products,
-                                address: null,
-                              );
-                            });
-                            setState(() {
-                              subtotal = calculateTotal(order?.products ?? []);
-                              total =
-                                  subtotal + (order?.address?.deliveryTax ?? 0);
-                            });
-                            this.setState(() {});
-                            print(order!.toJson());
-                            print(order!.address);
-                          },
+                            onSubmit: (orderFromDialog) {
+                              setState(() {
+                                order = Order(
+                                  createdAt: orderFromDialog.createdAt,
+                                  customerName: orderFromDialog.customerName,
+                                  orderTakeoutType: OrderTakeoutType.retirada,
+                                  orderTotal: orderFromDialog.orderTotal,
+                                  paymentMethod: orderFromDialog.paymentMethod,
+                                  phoneNumber: orderFromDialog.phoneNumber,
+                                  products: orderFromDialog.products,
+                                  address: null,
+                                );
+                              });
+                              setState(() {
+                                subtotal = calculateTotal(
+                                  order?.products ?? [],
+                                );
+                                total =
+                                    subtotal +
+                                    (order?.address?.deliveryTax ?? 0);
+                              });
+                              this.setState(() {});
+                              print(order!.toJson());
+                              print(order!.address);
+                            },
+                          ),
                         ),
-                      ),
-                    );
-                    /*total do pedido: 25*/
-                  },
-                  child: Text('retirada'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => StatefulBuilder(
-                        builder: (context, setState) => AddressDialog(
-                          takeoutType: OrderTakeoutType.entrega,
-                          onSubmit: (orderFromDialog) {
-                            setState(() {
-                              order = orderFromDialog;
-                              if (context.mounted) {
-                                setState(() {
-                                  subtotal = calculateTotal(
-                                    order?.products ?? [],
-                                  );
-                                  total =
-                                      subtotal +
-                                      (order?.address?.deliveryTax ?? 0);
-                                });
-                              }
-                            });
-                          },
+                      );
+                      /*total do pedido: 25*/
+                    },
+                    child: Text('retirada'),
+                  ),
+
+                  TextButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => StatefulBuilder(
+                          builder: (context, setState) => AddressDialog(
+                            takeoutType: OrderTakeoutType.entrega,
+                            onSubmit: (orderFromDialog) {
+                              setState(() {
+                                order = orderFromDialog;
+                                if (context.mounted) {
+                                  setState(() {
+                                    subtotal = calculateTotal(
+                                      order?.products ?? [],
+                                    );
+                                    total =
+                                        subtotal +
+                                        (order?.address?.deliveryTax ?? 0);
+                                  });
+                                }
+                              });
+                            },
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                  child: Text('entrega'),
-                ),
+                      );
+                    },
+                    child: Text('entrega'),
+                  ),
+                ],
                 SizedBox(width: 20, height: 20),
               ],
             ),
@@ -168,11 +192,27 @@ class _ShoppingCartState extends State<ShoppingCart> {
           ],
         ),
       ),
-      appBar: AppBar(title: Text('trespach lanches'), centerTitle: true),
+      appBar: AppBar(title: Text('Trespach Lanches'), centerTitle: true),
       body: SingleChildScrollView(
         child: Column(
           children: [
             Divider(),
+            if (hasProductsInCart == false) ...[
+              SizedBox(height: 200),
+              Text(
+                'Ops, não há produtos no carrinho!',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: () => Navigator.pushReplacement(
+                  context,
+                  CupertinoPageRoute(builder: (ctx) => HomePage()),
+                ),
+                child: Text('voltar a tela inicial'),
+              ),
+            ],
+
             FutureBuilder(
               future: recoverSelectedProducts(),
               builder: (context, asyncSnapshot) {
@@ -210,7 +250,14 @@ class _ShoppingCartState extends State<ShoppingCart> {
                           asyncSnapshot.data![index].id,
                         );
 
-                        await cartController.retrieveProductsInCart();
+                        final retriveProduct = await cartController
+                            .retrieveProductsInCart();
+                        if (retriveProduct.isEmpty) {
+                          setState(() {
+                            order = null;
+                            hasProductsInCart = false;
+                          });
+                        }
 
                         setState(() {});
                       },
@@ -224,19 +271,18 @@ class _ShoppingCartState extends State<ShoppingCart> {
             ),
 
             if (order != null)
-              Card(
-                child: Column(
-                  children: [
-                    Text('nome: ${order!.customerName}'),
+              Column(
+                children: [
+                  Text('nome: ${order!.customerName}'),
 
-                    order!.address != null
-                        ? Text(
-                            'endereço: ${order!.address!.address}\n + ${order!.address!.number}\n + ${order!.address!.neighborhood}',
-                          )
-                        : const SizedBox.shrink(),
-                    Text('forma de pagamento: ${order!.paymentMethod}'),
-                  ],
-                ),
+                  order!.address != null
+                      ? Text(
+                          'endereço: ${order!.address!.address}\n + ${order!.address!.number}\n + ${order!.address!.neighborhood}',
+                        )
+                      : const SizedBox.shrink(),
+                  Text('forma de pagamento: ${order!.paymentMethod.name}'),
+                  Text(' ${order!.orderTakeoutType.name} '),
+                ],
               ),
           ],
         ),
