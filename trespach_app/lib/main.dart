@@ -22,8 +22,29 @@ void main() async {
   runApp(
     MaterialApp(
       theme: ThemeData(
-        bottomSheetTheme: BottomSheetThemeData(
-          backgroundColor: Colors.transparent,
+        primaryColor: AppColors.primary,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.primary,
+          primary: AppColors.primary,
+          secondary: AppColors.secondary,
+          surface: AppColors.background,
+        ),
+        scaffoldBackgroundColor: AppColors.background,
+        appBarTheme: AppBarTheme(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.accent,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(foregroundColor: AppColors.secondary),
         ),
       ),
       home: HomePage(),
@@ -37,4 +58,11 @@ void main() async {
       },
     ),
   );
+}
+
+class AppColors {
+  static const Color primary = Color(0xFF0D47A1); // azul
+  static const Color secondary = Color(0xFFFFC107); // amarelo
+  static const Color accent = Color(0xFF4CAF50); // verde
+  static const Color background = Color(0xFFF5F5F5); // cinza claro
 }

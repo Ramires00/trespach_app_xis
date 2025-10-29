@@ -231,48 +231,7 @@ class _ProductDetailState extends State<ProductDetail> {
                           additionalsSelected.clear();
 
                           if (context.mounted) {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: Text('O que deseja fazer?'),
-                                content: SizedBox(
-                                  width: 300,
-                                  child: Text(
-                                    'Produto adicionado ao carrinho!',
-                                  ),
-                                ),
-                                actions: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      ElevatedButton(
-                                        child: Text('Selecionar mais produtos'),
-                                        onPressed: () => Navigator.of(context)
-                                            .pushAndRemoveUntil(
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    HomePage(),
-                                              ),
-                                              (routeSettings) =>
-                                                  routeSettings.isFirst,
-                                            ),
-                                      ),
-                                      ElevatedButton(
-                                        child: Text('Ir para o carrinho'),
-                                        onPressed: () =>
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ShoppingCart(),
-                                              ),
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            );
+                            Navigator.of(context).pop(true);
                           }
                         },
                   child: Text('Adicionar ao Carrinho'),

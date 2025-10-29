@@ -10,6 +10,7 @@ import 'package:trespach_app/model/enum/payment_method.dart';
 import 'package:trespach_app/model/order.dart';
 import 'package:trespach_app/model/product.dart';
 import 'package:trespach_app/view/home_page.dart';
+import 'package:trespach_app/view/widgets/checkout_dialog.dart';
 import 'package:trespach_app/view/widgets/scaffold_constraint.dart';
 
 num calculateAdditionals(List<Additional>? additionals) {
@@ -82,79 +83,79 @@ class _ShoppingCartState extends State<ShoppingCart> {
     return ScaffoldConstraint(
       bottomSheet: SizedBox(
         height: 65,
-
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              children: [
-                if (total > 0) ...[
-                  Text('subtotal: $subtotal'),
-                  if (order != null &&
-                      order!.address != null &&
-                      order?.address!.deliveryTax != null)
-                    Text('Valor da tele: ${order?.address!.deliveryTax}'),
-                  Text('total do pedido: $total'),
-                ],
-              ],
-            ),
-
-            //editar
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (hasProductsInCart) ...[
-                  TextButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => StatefulBuilder(
-                          builder: (context, setState) => AddressDialog(
-                            takeoutType: OrderTakeoutType.retirada,
+                Column(
+                  children: [
+                    if (total > 0 && hasProductsInCart) ...[
+                      Text('subtotal: $subtotal'),
+                      if (order != null && order?.address != null)
+                        Text('Valor da tele: ${order?.address!.deliveryTax}'),
+                      Text('total do pedido: $total'),
+                    ],
+                  ],
+                ),
 
-                            onSubmit: (orderFromDialog) {
-                              setState(() {
-                                order = Order(
-                                  createdAt: orderFromDialog.createdAt,
-                                  customerName: orderFromDialog.customerName,
-                                  orderTakeoutType: OrderTakeoutType.retirada,
-                                  orderTotal: orderFromDialog.orderTotal,
-                                  paymentMethod: orderFromDialog.paymentMethod,
-                                  phoneNumber: orderFromDialog.phoneNumber,
-                                  products: orderFromDialog.products,
-                                  address: null,
-                                );
-                              });
-                              setState(() {
-                                subtotal = calculateTotal(
-                                  order?.products ?? [],
-                                );
-                                total =
-                                    subtotal +
-                                    (order?.address?.deliveryTax ?? 0);
-                              });
-                              this.setState(() {});
-                              print(order!.toJson());
-                              print(order!.address);
-                            },
-                          ),
-                        ),
-                      );
-                      /*total do pedido: 25*/
-                    },
-                    child: Text('retirada'),
-                  ),
+                //editar
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    if (hasProductsInCart) ...[
+                      // TextButton(
+                      //   onPressed: () {
+                      //     showDialog(
+                      //       context: context,
+                      //       builder: (context) => StatefulBuilder(
+                      //         builder: (context, setState) => AddressDialog(
+                      //           takeoutType: OrderTakeoutType.values.first,
+                      //           //
+                      //           onSubmit: (orderFromDialog) {
+                      //             setState(() {
+                      //               order = Order(
+                      //                 createdAt: orderFromDialog.createdAt,
+                      //                 customerName:
+                      //                     orderFromDialog.customerName,
+                      //                 orderTakeoutType:
+                      //                     orderFromDialog.orderTakeoutType,
 
-                  TextButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => StatefulBuilder(
-                          builder: (context, setState) => AddressDialog(
-                            takeoutType: OrderTakeoutType.entrega,
-                            onSubmit: (orderFromDialog) {
-                              setState(() {
-                                order = orderFromDialog;
-                                if (context.mounted) {
+                      //                 orderTotal: orderFromDialog.orderTotal,
+                      //                 paymentMethod:
+                      //                     orderFromDialog.paymentMethod,
+                      //                 phoneNumber: orderFromDialog.phoneNumber,
+                      //                 products: orderFromDialog.products,
+                      //                 address: null,
+                      //               );
+                      //             });
+                      //             setState(() {
+                      //               subtotal = calculateTotal(
+                      //                 order?.products ?? [],
+                      //               );
+                      //               total =
+                      //                   subtotal +
+                      //                   (order?.address?.deliveryTax ?? 0);
+                      //             });
+                      //             this.setState(() {});
+                      //             print(order!.toJson());
+                      //             print(order!.address);
+                      //           },
+                      //         ),
+                      //       ),
+                      //     );
+                      //   },
+                      //   child: Text('Fazer pedido'),
+                      // ),
+                      TextButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => StatefulBuilder(
+                              builder: (_, setState) => AddressDialog(
+                                takeoutType: OrderTakeoutType.entrega,
+                                onSubmit: (orderFromDialog) {
                                   setState(() {
                                     subtotal = calculateTotal(
                                       order?.products ?? [],
@@ -162,33 +163,40 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                     total =
                                         subtotal +
                                         (order?.address?.deliveryTax ?? 0);
+                                    order = orderFromDialog;
                                   });
-                                }
-                              });
-                            },
-                          ),
+                                  this.setState(() {});
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                        child: Text('Fazer pedido'),
+                      ),
+                    ],
+                  ],
+                ),
+                if (order != null)
+                  TextButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          actions: [Center(child: Text('pedido enviado!'))],
                         ),
                       );
+                      cartController.createNewOrder(order?.toJson() ?? {});
+                      cartController.clearAll();
+                      setState(() {
+                        order = null;
+                        hasProductsInCart = false;
+                        total = 0;
+                      });
                     },
-                    child: Text('entrega'),
+                    child: Text('enviar pedido'),
                   ),
-                ],
-                SizedBox(width: 20, height: 20),
               ],
             ),
-            if (order != null)
-              TextButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      actions: [Center(child: Text('pedido enviado!'))],
-                    ),
-                  );
-                  cartController.createNewOrder(order?.toJson() ?? {});
-                },
-                child: Text('enviar pedido'),
-              ),
           ],
         ),
       ),
@@ -277,7 +285,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
 
                   order!.address != null
                       ? Text(
-                          'endereço: ${order!.address!.address}\n + ${order!.address!.number}\n + ${order!.address!.neighborhood}',
+                          'endereço: ${order!.address!.address}\nnúmero: ${order!.address!.number}\nbairro: ${order!.address!.neighborhood.neighborhood}',
                         )
                       : const SizedBox.shrink(),
                   Text('forma de pagamento: ${order!.paymentMethod.name}'),
@@ -286,209 +294,6 @@ class _ShoppingCartState extends State<ShoppingCart> {
               ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class AddressDialog extends StatefulWidget {
-  const AddressDialog({
-    required this.onSubmit,
-    required this.takeoutType,
-    super.key,
-  });
-
-  final void Function(Order order) onSubmit;
-  final OrderTakeoutType takeoutType;
-
-  @override
-  State<AddressDialog> createState() => _CheckoutDialog();
-}
-
-class _CheckoutDialog extends State<AddressDialog> {
-  TextEditingController addressController = TextEditingController();
-  TextEditingController numberController = TextEditingController();
-  MaskedTextController cepController = MaskedTextController(mask: '00000-000');
-  TextEditingController referenceController = TextEditingController();
-  TextEditingController nameController = TextEditingController();
-  MaskedTextController phoneController = MaskedTextController(
-    mask: '(00) 00000-0000',
-  );
-  final GlobalKey<FormState> checkoutFormState = GlobalKey();
-  final tele = OrderTakeoutType.entrega;
-  final CartController cartController = CartController();
-
-  Neighborhood? selectedNeighborhood;
-  PaymentMethod? paymentMethod;
-
-  List<DropdownMenuItem<String>> dropdownItems = PaymentMethod.values.map((
-    value,
-  ) {
-    return DropdownMenuItem<String>(value: value.name, child: Text(value.name));
-  }).toList();
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: checkoutFormState,
-      child: AlertDialog(
-        title: Center(child: Text('Preencha os dados para enviar o pedido')),
-        actions: [
-          if (widget.takeoutType == OrderTakeoutType.entrega) ...[
-            Text('Endereço para tele-entrega'),
-            TextFormField(
-              decoration: InputDecoration(hint: Text('endereço')),
-              controller: addressController,
-
-              validator: (currentText) {
-                if (currentText == null || currentText.isEmpty) {
-                  return 'digite um endereço válido!';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              decoration: InputDecoration(hint: Text('número')),
-              controller: numberController,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            ),
-            FutureBuilder(
-              future: cartController.retrieveNeighborhoods(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Text("Carregando bairros...");
-                }
-
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.data != null &&
-                    snapshot.data!.isNotEmpty) {
-                  return DropdownButtonFormField<String>(
-                    hint: Text('selecione um bairro'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'selecione um bairro!';
-                      }
-
-                      return null;
-                    },
-                    initialValue: selectedNeighborhood?.neighborhood,
-                    items: snapshot.data
-                        ?.map(
-                          (n) => DropdownMenuItem(
-                            value: n.neighborhood,
-                            child: Text(n.neighborhood),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (selected) {
-                      setState(() {
-                        selectedNeighborhood = snapshot.data!.firstWhere(
-                          (n) => n.neighborhood == selected,
-                        );
-                      });
-                    },
-                  );
-                }
-
-                return Text("Erro ao carregar bairros.");
-              },
-            ),
-            TextFormField(
-              decoration: InputDecoration(hint: Text('CEP')),
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              controller: cepController,
-              validator: (currentText) {
-                if (currentText == null ||
-                    currentText.isEmpty ||
-                    currentText.length < 9) {
-                  return 'digite um CEP válido!';
-                }
-
-                return null;
-              },
-            ),
-            Text('taxa de entrega'),
-            TextFormField(
-              maxLines: 4,
-              decoration: InputDecoration(hint: Text('ponto de referência')),
-              controller: referenceController,
-              validator: (currentText) {
-                if (currentText == null || currentText.isEmpty) {
-                  return 'digite um ponto de referência válido!';
-                }
-                return null;
-              },
-            ),
-          ],
-          TextFormField(
-            decoration: InputDecoration(hintText: 'Nome do cliente'),
-            controller: nameController,
-            validator: (currentText) {
-              if (currentText == null || currentText.isEmpty) {
-                return 'Nome do cliente precisa ser um nome válido';
-              }
-
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: phoneController,
-            decoration: InputDecoration(hintText: 'Número para contato'),
-            validator: (currentText) {
-              if (currentText == null || currentText.isEmpty) {
-                return 'Número de telefone inválido';
-              }
-            },
-          ),
-          DropdownButtonFormField<String>(
-            hint: Text('Forma de Pagamento'),
-            items: dropdownItems,
-            initialValue: paymentMethod?.name,
-            onChanged: (value) {
-              setState(() {
-                paymentMethod = PaymentMethod.values.firstWhere(
-                  (p) => p.name == value,
-                );
-              });
-            },
-          ),
-          TextButton(
-            onPressed: () async {
-              final isFormValid = checkoutFormState.currentState?.validate();
-              final products = await recoverSelectedProducts();
-              final total = calculateTotal(products ?? []);
-
-              if (isFormValid != null && isFormValid) {
-                final Order order = Order(
-                  address: Address(
-                    address: addressController.value.text,
-                    neighborhood:
-                        selectedNeighborhood ??
-                        Neighborhood(neighborhood: '', deliveryTax: 0),
-                    postalCode: cepController.value.text,
-                    deliveryTax: selectedNeighborhood?.deliveryTax,
-                    number: numberController.value.text,
-                    reference: referenceController.value.text,
-                  ),
-
-                  customerName: nameController.value.text,
-                  phoneNumber: phoneController.value.text,
-                  orderTotal: total,
-                  orderTakeoutType: tele,
-                  products: products ?? [],
-                  paymentMethod: paymentMethod ?? PaymentMethod.credito,
-                  createdAt: DateTime.now().toString(),
-                );
-
-                widget.onSubmit(order);
-                if (context.mounted) {
-                  Navigator.pop(context);
-                }
-              }
-            },
-            child: Text('Checkout'),
-          ),
-        ],
       ),
     );
   }

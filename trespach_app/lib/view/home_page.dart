@@ -67,12 +67,37 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                           );
-
-                      if (isProductAddedToCart != null &&
-                          isProductAddedToCart &&
-                          context.mounted) {
+                      if (context.mounted &&
+                          isProductAddedToCart != null &&
+                          isProductAddedToCart) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('produto adicionado!')),
+                          SnackBar(
+                            content: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('produto adicionado!'),
+                                TextButton(
+                                  onPressed: () {
+                                    ScaffoldMessenger.of(
+                                      context,
+                                    ).clearSnackBars();
+                                    Navigator.push(
+                                      context,
+                                      CupertinoPageRoute(
+                                        builder: (context) => ShoppingCart(),
+                                      ),
+                                    );
+                                  },
+                                  child: Row(
+                                    children: [
+                                      Text("Ir para o carrinho"),
+                                      Icon(Icons.shopping_cart),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         );
                       }
                     },

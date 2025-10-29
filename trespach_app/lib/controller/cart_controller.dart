@@ -9,6 +9,12 @@ import 'package:trespach_app/model/product.dart';
 typedef JSON = Map<String, dynamic>;
 
 class CartController {
+  Future<void> clearAll() async {
+    await LocalStorage.clearAll(
+      localStorageCollection: LocalStorageCollections.cartProducts,
+    );
+  }
+
   Future<void> saveProductInCart({required JSON productJSON}) async {
     try {
       await LocalStorage.storeJson(

@@ -26,4 +26,10 @@ class LocalStorage {
     required String id,
   }) async =>
       await _db.collection(localStorageCollection.name).doc(id).delete();
+
+  static Future<void> clearAll({
+    required LocalStorageCollections localStorageCollection,
+  }) async {
+    await _db.collection(localStorageCollection.name).delete();
+  }
 }
