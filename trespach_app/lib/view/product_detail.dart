@@ -7,6 +7,8 @@ import 'package:trespach_app/external_services/localstorage/localstorage.dart';
 import 'package:trespach_app/view/cart_page.dart';
 import 'package:trespach_app/view/home_page.dart';
 import 'package:trespach_app/view/widgets/scaffold_constraint.dart';
+import 'package:uuid/uuid.dart';
+import 'package:uuid/v4.dart';
 
 class ProductDetail extends StatefulWidget {
   const ProductDetail({super.key, this.produtoSelecionado});
@@ -218,6 +220,7 @@ class _ProductDetailState extends State<ProductDetail> {
                             localStorageCollection:
                                 LocalStorageCollections.cartProducts,
                             data: Product(
+                              cartId: Uuid().v4(),
                               id: widget.produtoSelecionado!.id,
                               name: widget.produtoSelecionado!.name,
                               description:

@@ -8,12 +8,14 @@ class Product {
     required this.name,
     required this.description,
     required this.price,
+    required this.cartId,
     this.additionals,
     this.image,
     required this.notes,
     this.quantity,
   });
 
+  final String? cartId;
   final String id;
   final String name;
   final String description;
@@ -25,6 +27,7 @@ class Product {
 
   factory Product.fromJson(JSON json) {
     return Product(
+      cartId: json["cartId"],
       id: json['id'],
       name: json['name'],
       description: json['description'],
@@ -40,6 +43,7 @@ class Product {
 
   JSON toJson() {
     return {
+      "cartId": cartId,
       "id": id,
       "name": name,
       "description": description,

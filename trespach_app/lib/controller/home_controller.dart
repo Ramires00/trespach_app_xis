@@ -15,8 +15,9 @@ class HomeController {
           .toList();
 
       return products;
-    } catch (err) {
-      debugPrint(err.toString());
+    } catch (err, st) {
+      print(err);
+      print(st);
       rethrow;
     }
   }

@@ -11,7 +11,7 @@ class LocalStorage {
     required JSON data,
   }) async => await _db
       .collection(localStorageCollection.name)
-      .doc(data["id"])
+      .doc(data["cartId"])
       .set(data);
 
   static Future<List> getAllJsons({

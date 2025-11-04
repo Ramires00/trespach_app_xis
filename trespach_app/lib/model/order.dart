@@ -14,6 +14,7 @@ class Order {
     required this.orderTakeoutType,
     required this.products,
     required this.paymentMethod,
+    this.isNecessaryExchange,
     required this.createdAt,
   });
 
@@ -24,6 +25,7 @@ class Order {
   final OrderTakeoutType orderTakeoutType;
   final List<Product> products;
   final PaymentMethod paymentMethod;
+  final String? isNecessaryExchange;
   final String createdAt;
 
   JSON toJson() {
@@ -34,6 +36,7 @@ class Order {
       "orderTakeoutType": orderTakeoutType.name,
       "products": products.map((p) => p.toJson()).toList(),
       "paymentMethod": paymentMethod.name,
+      "isNecessaryExchange": isNecessaryExchange,
       "createdAt": createdAt,
     };
   }

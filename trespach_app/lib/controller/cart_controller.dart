@@ -27,10 +27,10 @@ class CartController {
     }
   }
 
-  Future<void> deleteProduct(String id) async {
+  Future<void> deleteProduct(String cartId) async {
     LocalStorage.deleteJson(
       localStorageCollection: LocalStorageCollections.cartProducts,
-      id: id,
+      id: cartId,
     );
   }
 

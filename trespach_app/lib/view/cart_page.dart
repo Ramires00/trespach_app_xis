@@ -100,74 +100,46 @@ class _ShoppingCartState extends State<ShoppingCart> {
                   ],
                 ),
 
-                //editar
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     if (hasProductsInCart) ...[
-                      // TextButton(
-                      //   onPressed: () {
-                      //     showDialog(
-                      //       context: context,
-                      //       builder: (context) => StatefulBuilder(
-                      //         builder: (context, setState) => AddressDialog(
-                      //           takeoutType: OrderTakeoutType.values.first,
-                      //           //
-                      //           onSubmit: (orderFromDialog) {
-                      //             setState(() {
-                      //               order = Order(
-                      //                 createdAt: orderFromDialog.createdAt,
-                      //                 customerName:
-                      //                     orderFromDialog.customerName,
-                      //                 orderTakeoutType:
-                      //                     orderFromDialog.orderTakeoutType,
-
-                      //                 orderTotal: orderFromDialog.orderTotal,
-                      //                 paymentMethod:
-                      //                     orderFromDialog.paymentMethod,
-                      //                 phoneNumber: orderFromDialog.phoneNumber,
-                      //                 products: orderFromDialog.products,
-                      //                 address: null,
-                      //               );
-                      //             });
-                      //             setState(() {
-                      //               subtotal = calculateTotal(
-                      //                 order?.products ?? [],
-                      //               );
-                      //               total =
-                      //                   subtotal +
-                      //                   (order?.address?.deliveryTax ?? 0);
-                      //             });
-                      //             this.setState(() {});
-                      //             print(order!.toJson());
-                      //             print(order!.address);
-                      //           },
-                      //         ),
-                      //       ),
-                      //     );
-                      //   },
-                      //   child: Text('Fazer pedido'),
-                      // ),
                       TextButton(
                         onPressed: () {
                           showDialog(
                             context: context,
-                            builder: (context) => StatefulBuilder(
-                              builder: (_, setState) => AddressDialog(
-                                takeoutType: OrderTakeoutType.entrega,
-                                onSubmit: (orderFromDialog) {
-                                  setState(() {
-                                    subtotal = calculateTotal(
-                                      order?.products ?? [],
-                                    );
-                                    total =
-                                        subtotal +
-                                        (order?.address?.deliveryTax ?? 0);
-                                    order = orderFromDialog;
-                                  });
-                                  this.setState(() {});
-                                },
-                              ),
+                            builder: (context) => AddressDialog(
+                              //
+                              onSubmit: (orderFromDialog) {
+                                setState(() {
+                                  order = Order(
+                                    createdAt: orderFromDialog.createdAt,
+                                    customerName: orderFromDialog.customerName,
+                                    orderTakeoutType:
+                                        orderFromDialog.orderTakeoutType,
+
+                                    orderTotal: orderFromDialog.orderTotal,
+                                    paymentMethod:
+                                        orderFromDialog.paymentMethod,
+                                    phoneNumber: orderFromDialog.phoneNumber,
+                                    products: orderFromDialog.products,
+                                    isNecessaryExchange:
+                                        orderFromDialog.isNecessaryExchange,
+                                    address: null,
+                                  );
+                                });
+                                setState(() {
+                                  subtotal = calculateTotal(
+                                    order?.products ?? [],
+                                  );
+                                  total =
+                                      subtotal +
+                                      (order?.address?.deliveryTax ?? 0);
+                                });
+                                this.setState(() {});
+                                print(order!.toJson());
+                                print(order!.address);
+                              },
                             ),
                           );
                         },
@@ -182,7 +154,20 @@ class _ShoppingCartState extends State<ShoppingCart> {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                          actions: [Center(child: Text('pedido enviado!'))],
+                          actions: [
+                            Center(
+                              child: SizedBox(
+                                width: 150,
+                                height: 150,
+                                child: Center(
+                                  child: Text(
+                                    'pedido enviado!',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       );
                       cartController.createNewOrder(order?.toJson() ?? {});
@@ -254,8 +239,11 @@ class _ShoppingCartState extends State<ShoppingCart> {
                     trailing: IconButton(
                       color: Colors.red,
                       onPressed: () async {
+                        print(asyncSnapshot.data![index].cartId);
+                        if (asyncSnapshot.data![index].cartId == null) return;
+
                         await cartController.deleteProduct(
-                          asyncSnapshot.data![index].id,
+                          asyncSnapshot.data![index].cartId!,
                         );
 
                         final retriveProduct = await cartController

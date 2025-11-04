@@ -156,9 +156,9 @@ class _HomePageState extends State<HomePage> {
               );
             }
 
-            if (snapshot.hasError) {
-              return Center(child: Text("Ocorreu um erro."));
-            }
+            // if (snapshot.hasError) {
+            //   return Center(child: Text("Ocorreu um erro."));
+            // }
 
             return Center(child: CircularProgressIndicator());
           },
