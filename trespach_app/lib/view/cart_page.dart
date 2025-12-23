@@ -1,12 +1,8 @@
-import 'package:extended_masked_text/extended_masked_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:trespach_app/controller/cart_controller.dart';
 import 'package:trespach_app/model/additional.dart';
-import 'package:trespach_app/model/address.dart';
 import 'package:trespach_app/model/enum/order_takeout_type.dart';
-import 'package:trespach_app/model/enum/payment_method.dart';
 import 'package:trespach_app/model/order.dart';
 import 'package:trespach_app/model/product.dart';
 import 'package:trespach_app/view/home_page.dart';
@@ -52,7 +48,6 @@ Future<List<Product>?> recoverSelectedProducts() async {
     final recoverData = await CartController().retrieveProductsInCart();
     return recoverData;
   } catch (e) {
-    print(e.toString());
     return null;
   }
 }
@@ -71,8 +66,10 @@ class _ShoppingCartState extends State<ShoppingCart> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final products = await cartController.retrieveProductsInCart();
+
       setState(() {
         hasProductsInCart = products.isNotEmpty;
+        subtotal = calculateTotal(products);
       });
     });
     super.initState();
@@ -82,107 +79,121 @@ class _ShoppingCartState extends State<ShoppingCart> {
   Widget build(BuildContext context) {
     return ScaffoldConstraint(
       bottomSheet: SizedBox(
-        height: 65,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  children: [
-                    if (total > 0 && hasProductsInCart) ...[
-                      Text('subtotal: $subtotal'),
-                      if (order != null && order?.address != null)
-                        Text('Valor da tele: ${order?.address!.deliveryTax}'),
-                      Text('total do pedido: $total'),
+        child: Padding(
+          padding: EdgeInsetsGeometry.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 8,
+            children: [
+              Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (subtotal > 0 && hasProductsInCart) ...[
+                        Text('subtotal: $subtotal', textAlign: TextAlign.left),
+                        if (order != null && order?.address != null)
+                          Text(
+                            'Valor da tele: ${order?.address!.deliveryTax}',
+                            textAlign: TextAlign.left,
+                          ),
+                        Text(
+                          'total do pedido: $total',
+                          textAlign: TextAlign.left,
+                        ),
+
+                        Text('nome: ${order?.customerName ?? ''}'),
+
+                        if (order != null &&
+                            order!.orderTakeoutType ==
+                                OrderTakeoutType.entrega) ...[
+                          Text(
+                            'endereço: ${order?.address?.address ?? ''}\nnúmero: ${order?.address?.number ?? ''}\nbairro: ${order?.address?.neighborhood.neighborhood ?? ''}',
+                          ),
+
+                          Text(
+                            'forma de pagamento: ${order?.paymentMethod.name ?? ''}',
+                          ),
+                        ],
+                        Text(' ${order?.orderTakeoutType.name ?? ''} '),
+                      ],
                     ],
-                  ],
-                ),
+                  ),
+                ],
+              ),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    if (hasProductsInCart) ...[
-                      TextButton(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => AddressDialog(
-                              //
-                              onSubmit: (orderFromDialog) {
-                                setState(() {
-                                  order = Order(
-                                    createdAt: orderFromDialog.createdAt,
-                                    customerName: orderFromDialog.customerName,
-                                    orderTakeoutType:
-                                        orderFromDialog.orderTakeoutType,
+              if (hasProductsInCart && order == null) ...[
+                ElevatedButton(
+                  style: ButtonStyle(),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AddressDialog(
+                        //
+                        onSubmit: (orderFromDialog) {
+                          setState(() {
+                            order = Order(
+                              createdAt: orderFromDialog.createdAt,
+                              customerName: orderFromDialog.customerName,
+                              orderTakeoutType:
+                                  orderFromDialog.orderTakeoutType,
 
-                                    orderTotal: orderFromDialog.orderTotal,
-                                    paymentMethod:
-                                        orderFromDialog.paymentMethod,
-                                    phoneNumber: orderFromDialog.phoneNumber,
-                                    products: orderFromDialog.products,
-                                    isNecessaryExchange:
-                                        orderFromDialog.isNecessaryExchange,
-                                    address: null,
-                                  );
-                                });
-                                setState(() {
-                                  subtotal = calculateTotal(
-                                    order?.products ?? [],
-                                  );
-                                  total =
-                                      subtotal +
-                                      (order?.address?.deliveryTax ?? 0);
-                                });
-                                this.setState(() {});
-                                print(order!.toJson());
-                                print(order!.address);
-                              },
-                            ),
-                          );
+                              orderTotal: orderFromDialog.orderTotal,
+                              paymentMethod: orderFromDialog.paymentMethod,
+                              phoneNumber: orderFromDialog.phoneNumber,
+                              products: orderFromDialog.products,
+                              isNecessaryExchange:
+                                  orderFromDialog.isNecessaryExchange,
+                              address: null,
+                            );
+                          });
+                          setState(() {
+                            subtotal = calculateTotal(order?.products ?? []);
+                            total =
+                                subtotal + (order?.address?.deliveryTax ?? 0);
+                          });
                         },
-                        child: Text('Fazer pedido'),
                       ),
-                    ],
-                  ],
+                    );
+                  },
+                  child: Text('Preencher dados de entrega'),
                 ),
-                if (order != null)
-                  TextButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          actions: [
-                            Center(
-                              child: SizedBox(
-                                width: 150,
-                                height: 150,
-                                child: Center(
-                                  child: Text(
-                                    'pedido enviado!',
-                                    style: TextStyle(fontSize: 16),
-                                  ),
+              ],
+              if (order != null)
+                ElevatedButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        actions: [
+                          Center(
+                            child: SizedBox(
+                              width: 150,
+                              height: 150,
+                              child: Center(
+                                child: Text(
+                                  'pedido enviado!',
+                                  style: TextStyle(fontSize: 16),
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                      );
-                      cartController.createNewOrder(order?.toJson() ?? {});
-                      cartController.clearAll();
-                      setState(() {
-                        order = null;
-                        hasProductsInCart = false;
-                        total = 0;
-                      });
-                    },
-                    child: Text('enviar pedido'),
-                  ),
-              ],
-            ),
-          ],
+                          ),
+                        ],
+                      ),
+                    );
+                    cartController.createNewOrder(order?.toJson() ?? {});
+                    cartController.clearAll();
+                    setState(() {
+                      order = null;
+                      hasProductsInCart = false;
+                      total = 0;
+                    });
+                  },
+                  child: Text('enviar pedido'),
+                ),
+            ],
+          ),
         ),
       ),
       appBar: AppBar(title: Text('Trespach Lanches'), centerTitle: true),
@@ -215,6 +226,11 @@ class _ShoppingCartState extends State<ShoppingCart> {
                 return ListView.builder(
                   shrinkWrap: true,
                   itemBuilder: (context, index) => ListTile(
+                    leading: Container(
+                      color: Colors.blueAccent,
+                      height: 90,
+                      width: 90,
+                    ),
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
@@ -222,7 +238,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                         Text(asyncSnapshot.data![index].name),
                         if (asyncSnapshot.data![index].notes.isNotEmpty)
                           Text(
-                            'Observação: ${asyncSnapshot.data![index].notes.length == 0 ? '-' : asyncSnapshot.data![index].notes}',
+                            'Observação: ${asyncSnapshot.data![index].notes.isEmpty ? '-' : asyncSnapshot.data![index].notes}',
                           ),
                       ],
                     ),
@@ -265,21 +281,6 @@ class _ShoppingCartState extends State<ShoppingCart> {
                 );
               },
             ),
-
-            if (order != null)
-              Column(
-                children: [
-                  Text('nome: ${order!.customerName}'),
-
-                  order!.address != null
-                      ? Text(
-                          'endereço: ${order!.address!.address}\nnúmero: ${order!.address!.number}\nbairro: ${order!.address!.neighborhood.neighborhood}',
-                        )
-                      : const SizedBox.shrink(),
-                  Text('forma de pagamento: ${order!.paymentMethod.name}'),
-                  Text(' ${order!.orderTakeoutType.name} '),
-                ],
-              ),
           ],
         ),
       ),

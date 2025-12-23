@@ -52,202 +52,181 @@ class _CheckoutDialog extends State<AddressDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: checkoutFormState,
-      child: StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: Center(child: Text('Preencha os dados para enviar o pedido')),
-          actions: [
-            TextFormField(
-              decoration: InputDecoration(hintText: 'Nome do cliente'),
-              controller: nameController,
-              validator: (currentText) {
-                if (currentText == null || currentText.isEmpty) {
-                  return 'Nome do cliente precisa ser um nome válido';
-                }
-
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: phoneController,
-              decoration: InputDecoration(hintText: 'Número para contato'),
-              validator: (currentText) {
-                if (currentText == null || currentText.isEmpty) {
-                  return 'Número de telefone inválido';
-                }
-              },
-            ),
-            DropdownButtonFormField<String>(
-              hint: Text('Forma de Pagamento'),
-              items: dropdownItems,
-              initialValue: paymentMethod?.name,
-              onChanged: (value) {
-                setState(() {
-                  paymentMethod = PaymentMethod.values.firstWhere(
-                    (p) => p.name == value,
-                  );
-                });
-              },
-            ),
-            if (paymentMethod == PaymentMethod.dinheiro) ...[
-              TextFormField(
-                controller: moneyController,
-                decoration: InputDecoration(
-                  hintText: 'deixar 0 caso não precise de troco.',
-                ),
-                validator: (currentText) {
-                  if (currentText == null || currentText.isEmpty) {
-                    return 'Caso não precise de troco, digitar 0';
-                  }
-                },
-              ),
-            ],
-            DropdownButtonFormField<OrderTakeoutType>(
-              hint: Text('Pedido para Retirada ou Entrega'),
-              items: dropdownOrder,
-              initialValue: orderTakeoutType,
-
-              onChanged: (value) {
-                setState(() {
-                  orderTakeoutType = value;
-                });
-              },
-            ),
-
-            if (orderTakeoutType == OrderTakeoutType.entrega) ...[
-              TextFormField(
-                decoration: InputDecoration(hint: Text('endereço')),
-                controller: addressController,
-
-                validator: (currentText) {
-                  if (currentText == null || currentText.isEmpty) {
-                    return 'digite um endereço válido!';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(hint: Text('número')),
-                controller: numberController,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              ),
-              FutureBuilder(
-                future: cartController.retrieveNeighborhoods(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Text("Carregando bairros...");
-                  }
-
-                  if (snapshot.connectionState == ConnectionState.done &&
-                      snapshot.data != null &&
-                      snapshot.data!.isNotEmpty) {
-                    return DropdownButtonFormField<String>(
-                      hint: Text('selecione um bairro'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'selecione um bairro!';
-                        }
-
-                        return null;
-                      },
-                      initialValue: selectedNeighborhood?.neighborhood,
-                      items: snapshot.data
-                          ?.map(
-                            (n) => DropdownMenuItem(
-                              value: n.neighborhood,
-                              child: Text(n.neighborhood),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (selected) {
-                        setState(() {
-                          selectedNeighborhood = snapshot.data!.firstWhere(
-                            (n) => n.neighborhood == selected,
-                          );
-                        });
-                      },
-                    );
-                  }
-
-                  return Text("Erro ao carregar bairros.");
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(hint: Text('CEP')),
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                controller: cepController,
-                validator: (currentText) {
-                  if (currentText == null ||
-                      currentText.isEmpty ||
-                      currentText.length < 9) {
-                    return 'digite um CEP válido!';
-                  }
-
-                  return null;
-                },
-              ),
-              TextFormField(
-                maxLines: 4,
-                decoration: InputDecoration(hint: Text('ponto de referência')),
-                controller: referenceController,
-                validator: (currentText) {
-                  if (currentText == null || currentText.isEmpty) {
-                    return 'digite um ponto de referência válido!';
-                  }
-                  return null;
-                },
-              ),
-            ],
-
-            Center(
-              child: SizedBox(
-                width: 160,
-                child: TextButton(
-                  onPressed: () async {
-                    final isFormValid = checkoutFormState.currentState
-                        ?.validate();
-                    final products = await recoverSelectedProducts();
-                    final total = calculateTotal(products ?? []);
-
-                    if (isFormValid != null && isFormValid) {
-                      final Order order = Order(
-                        address: Address(
-                          address: addressController.value.text,
-                          neighborhood:
-                              selectedNeighborhood ??
-                              Neighborhood(neighborhood: '', deliveryTax: 0),
-                          postalCode: cepController.value.text,
-                          deliveryTax: selectedNeighborhood?.deliveryTax,
-                          number: numberController.value.text,
-                          reference: referenceController.value.text,
-                        ),
-
-                        customerName: nameController.value.text,
-                        phoneNumber: phoneController.value.text,
-                        orderTotal: total,
-                        orderTakeoutType: orderTakeoutType!,
-                        products: products ?? [],
-                        paymentMethod: paymentMethod!,
-                        isNecessaryExchange: moneyController.value.text,
-                        createdAt: DateTime.now().toString(),
-                      );
-                      widget.onSubmit(order);
-                      if (context.mounted) {
-                        Navigator.pop(context);
-                      }
-                    }
-                  },
-                  style: TextButton.styleFrom(
-                    textStyle: const TextStyle(fontSize: 18),
+    return AlertDialog(
+      title: const Center(child: Text('Dados do Pedido')),
+      content: Form(
+        key: checkoutFormState, // O Form deve envolver o conteúdo para validar
+        child: StatefulBuilder(
+          builder: (context, setState) {
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // --- DADOS DO CLIENTE ---
+                  TextFormField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Nome do cliente',
+                    ),
+                    validator: (value) => (value == null || value.isEmpty)
+                        ? 'Campo obrigatório'
+                        : null,
                   ),
-                  child: Text('Salvar'),
-                ),
+                  TextFormField(
+                    controller: phoneController,
+                    decoration: const InputDecoration(labelText: 'Telefone'),
+                    keyboardType: TextInputType.phone,
+                    validator: (value) => (value == null || value.isEmpty)
+                        ? 'Campo obrigatório'
+                        : null,
+                  ),
+
+                  const Divider(height: 30),
+
+                  // --- PAGAMENTO ---
+                  DropdownButtonFormField<PaymentMethod>(
+                    value: paymentMethod,
+                    hint: const Text('Forma de Pagamento'),
+                    items: PaymentMethod.values
+                        .map(
+                          (v) =>
+                              DropdownMenuItem(value: v, child: Text(v.name)),
+                        )
+                        .toList(),
+                    onChanged: (val) => setState(() => paymentMethod = val),
+                    validator: (value) =>
+                        value == null ? 'Selecione o pagamento' : null,
+                  ),
+
+                  if (paymentMethod == PaymentMethod.dinheiro)
+                    TextFormField(
+                      controller: moneyController,
+                      decoration: const InputDecoration(
+                        labelText: 'Troco para quanto?',
+                        hintText: '0 se não precisar',
+                      ),
+                      keyboardType: TextInputType.number,
+                      validator: (value) => (value == null || value.isEmpty)
+                          ? 'Informe o valor ou 0'
+                          : null,
+                    ),
+
+                  // --- TIPO DE ENTREGA ---
+                  DropdownButtonFormField<OrderTakeoutType>(
+                    value: orderTakeoutType,
+                    hint: const Text('Entrega ou Retirada?'),
+                    items: OrderTakeoutType.values
+                        .map(
+                          (v) =>
+                              DropdownMenuItem(value: v, child: Text(v.name)),
+                        )
+                        .toList(),
+                    onChanged: (val) => setState(() => orderTakeoutType = val),
+                    validator: (value) =>
+                        value == null ? 'Selecione uma opção' : null,
+                  ),
+
+                  // --- CAMPOS DE ENDEREÇO (SÓ APARECEM SE FOR ENTREGA) ---
+                  if (orderTakeoutType == OrderTakeoutType.entrega) ...[
+                    TextFormField(
+                      controller: addressController,
+                      decoration: const InputDecoration(
+                        labelText: 'Rua/Endereço',
+                      ),
+                      validator: (value) => (value == null || value.isEmpty)
+                          ? 'Endereço obrigatório'
+                          : null,
+                    ),
+                    TextFormField(
+                      controller: numberController,
+                      decoration: const InputDecoration(labelText: 'Número'),
+                      keyboardType: TextInputType.number,
+                      validator: (value) => (value == null || value.isEmpty)
+                          ? 'Obrigatório'
+                          : null,
+                    ),
+
+                    // Bairros via FutureBuilder
+                    FutureBuilder<List<Neighborhood>>(
+                      future: cartController.retrieveNeighborhoods(),
+                      builder: (context, snapshot) {
+                        return DropdownButtonFormField<String>(
+                          value: selectedNeighborhood?.neighborhood,
+                          hint: const Text('Selecione o Bairro'),
+                          items: snapshot.data
+                              ?.map(
+                                (n) => DropdownMenuItem(
+                                  value: n.neighborhood,
+                                  child: Text(n.neighborhood),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (val) {
+                            setState(
+                              () => selectedNeighborhood = snapshot.data!
+                                  .firstWhere((n) => n.neighborhood == val),
+                            );
+                          },
+                          validator: (value) =>
+                              value == null ? 'Bairro obrigatório' : null,
+                        );
+                      },
+                    ),
+
+                    TextFormField(
+                      controller: cepController,
+                      decoration: const InputDecoration(labelText: 'CEP'),
+                      validator: (value) => (value == null || value.length < 9)
+                          ? 'CEP inválido'
+                          : null,
+                    ),
+                  ],
+                ],
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            // AQUI A MÁGICA ACONTECE: Só avança se o validate() retornar true
+            if (checkoutFormState.currentState!.validate()) {
+              final products = await recoverSelectedProducts();
+              final total = calculateTotal(products ?? []);
+
+              final Order order = Order(
+                address: Address(
+                  address: addressController.text,
+                  neighborhood:
+                      selectedNeighborhood ??
+                      Neighborhood(neighborhood: '', deliveryTax: 0),
+                  postalCode: cepController.text,
+                  deliveryTax: selectedNeighborhood?.deliveryTax,
+                  number: numberController.text,
+                  reference: referenceController.text,
+                ),
+                customerName: nameController.text,
+                phoneNumber: phoneController.text,
+                orderTotal: total,
+                orderTakeoutType: orderTakeoutType!,
+                products: products ?? [],
+                paymentMethod: paymentMethod!,
+                isNecessaryExchange: moneyController.text,
+                createdAt: DateTime.now().toString(),
+              );
+
+              widget.onSubmit(order);
+              if (context.mounted) Navigator.pop(context);
+            }
+          },
+          child: const Text('Finalizar Pedido'),
+        ),
+      ],
     );
   }
 }

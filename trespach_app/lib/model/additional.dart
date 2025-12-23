@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 typedef JSON = Map<String, dynamic>;
 
 class Additional {

@@ -4,11 +4,8 @@ import 'package:trespach_app/external_services/localstorage/localstorage_collect
 import 'package:trespach_app/model/additional.dart';
 import 'package:trespach_app/model/product.dart';
 import 'package:trespach_app/external_services/localstorage/localstorage.dart';
-import 'package:trespach_app/view/cart_page.dart';
-import 'package:trespach_app/view/home_page.dart';
 import 'package:trespach_app/view/widgets/scaffold_constraint.dart';
 import 'package:uuid/uuid.dart';
-import 'package:uuid/v4.dart';
 
 class ProductDetail extends StatefulWidget {
   const ProductDetail({super.key, this.produtoSelecionado});
@@ -167,7 +164,7 @@ class _ProductDetailState extends State<ProductDetail> {
                           );
                         });
                       }
-                      this.setState(() {});
+                      setState(() {});
                     },
                   ),
                   subtitle: Text(
@@ -304,7 +301,7 @@ class _NumberStepperState extends State<NumberStepper> {
             }
           },
         ),
-        Text('${quantity}'),
+        Text('$quantity'),
         IconButton(
           icon: Icon(Icons.add),
           onPressed: () {
