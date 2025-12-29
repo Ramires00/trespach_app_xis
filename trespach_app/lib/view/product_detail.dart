@@ -85,8 +85,13 @@ class _ProductDetailState extends State<ProductDetail> {
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) => ListTile(
-                  title: Text(
-                    widget.produtoSelecionado!.additionals![index].name,
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Adicionais:'),
+                      SizedBox(height: 15),
+                      Text(widget.produtoSelecionado!.additionals![index].name),
+                    ],
                   ),
                   trailing: NumberStepper(
                     quantityLimit: widget
@@ -183,13 +188,16 @@ class _ProductDetailState extends State<ProductDetail> {
             SizedBox(height: 8),
             SizedBox(
               width: 770,
-              child: TextField(
-                maxLines: 5,
-                controller: notesController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  focusedBorder: OutlineInputBorder(),
-                  hintText: 'Observação: Tirar milho e ervilha.',
+              child: Opacity(
+                opacity: 0.5,
+                child: TextField(
+                  maxLines: 5,
+                  controller: notesController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(),
+                    hintText: 'Observação: Tirar milho e ervilha.',
+                  ),
                 ),
               ),
             ),
@@ -209,6 +217,7 @@ class _ProductDetailState extends State<ProductDetail> {
                     });
                   },
                 ),
+                SizedBox(width: 25),
                 ElevatedButton(
                   onPressed: quantity <= 0
                       ? null
@@ -234,6 +243,7 @@ class _ProductDetailState extends State<ProductDetail> {
                             Navigator.of(context).pop(true);
                           }
                         },
+
                   child: Text('Adicionar ao Carrinho'),
                 ),
               ],

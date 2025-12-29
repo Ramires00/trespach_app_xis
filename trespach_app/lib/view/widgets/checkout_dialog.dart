@@ -55,14 +55,13 @@ class _CheckoutDialog extends State<AddressDialog> {
     return AlertDialog(
       title: const Center(child: Text('Dados do Pedido')),
       content: Form(
-        key: checkoutFormState, // O Form deve envolver o conteúdo para validar
+        key: checkoutFormState,
         child: StatefulBuilder(
           builder: (context, setState) {
             return SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // --- DADOS DO CLIENTE ---
                   TextFormField(
                     controller: nameController,
                     decoration: const InputDecoration(
@@ -83,9 +82,8 @@ class _CheckoutDialog extends State<AddressDialog> {
 
                   const Divider(height: 30),
 
-                  // --- PAGAMENTO ---
                   DropdownButtonFormField<PaymentMethod>(
-                    value: paymentMethod,
+                    initialValue: paymentMethod,
                     hint: const Text('Forma de Pagamento'),
                     items: PaymentMethod.values
                         .map(
@@ -110,10 +108,8 @@ class _CheckoutDialog extends State<AddressDialog> {
                           ? 'Informe o valor ou 0'
                           : null,
                     ),
-
-                  // --- TIPO DE ENTREGA ---
                   DropdownButtonFormField<OrderTakeoutType>(
-                    value: orderTakeoutType,
+                    initialValue: orderTakeoutType,
                     hint: const Text('Entrega ou Retirada?'),
                     items: OrderTakeoutType.values
                         .map(
@@ -126,7 +122,6 @@ class _CheckoutDialog extends State<AddressDialog> {
                         value == null ? 'Selecione uma opção' : null,
                   ),
 
-                  // --- CAMPOS DE ENDEREÇO (SÓ APARECEM SE FOR ENTREGA) ---
                   if (orderTakeoutType == OrderTakeoutType.entrega) ...[
                     TextFormField(
                       controller: addressController,
@@ -145,13 +140,11 @@ class _CheckoutDialog extends State<AddressDialog> {
                           ? 'Obrigatório'
                           : null,
                     ),
-
-                    // Bairros via FutureBuilder
                     FutureBuilder<List<Neighborhood>>(
                       future: cartController.retrieveNeighborhoods(),
                       builder: (context, snapshot) {
                         return DropdownButtonFormField<String>(
-                          value: selectedNeighborhood?.neighborhood,
+                          initialValue: selectedNeighborhood?.neighborhood,
                           hint: const Text('Selecione o Bairro'),
                           items: snapshot.data
                               ?.map(
@@ -194,7 +187,6 @@ class _CheckoutDialog extends State<AddressDialog> {
         ),
         ElevatedButton(
           onPressed: () async {
-            // AQUI A MÁGICA ACONTECE: Só avança se o validate() retornar true
             if (checkoutFormState.currentState!.validate()) {
               final products = await recoverSelectedProducts();
               final total = calculateTotal(products ?? []);
