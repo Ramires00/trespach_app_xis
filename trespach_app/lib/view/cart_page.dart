@@ -211,7 +211,13 @@ class _ShoppingCartState extends State<ShoppingCart> {
               ElevatedButton(
                 onPressed: () => Navigator.pushReplacement(
                   context,
-                  CupertinoPageRoute(builder: (ctx) => HomePage()),
+                  PageRouteBuilder(
+                    pageBuilder: (_, __, ___) => HomePage(),
+                    transitionDuration: Duration.zero,
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) =>
+                            child,
+                  ),
                 ),
                 child: Text('voltar a tela inicial'),
               ),

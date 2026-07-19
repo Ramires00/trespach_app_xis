@@ -30,9 +30,14 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.shopping_cart_rounded, color: Colors.black),
-            onPressed: () => Navigator.of(
-              context,
-            ).push(CupertinoPageRoute(builder: (context) => ShoppingCart())),
+            onPressed: () => Navigator.of(context).push(
+              PageRouteBuilder(
+                pageBuilder: (_, __, ___) => ShoppingCart(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) => child,
+                transitionDuration: Duration.zero,
+              ),
+            ),
           ),
         ],
       ),
@@ -59,12 +64,20 @@ class _HomePageState extends State<HomePage> {
                     onTap: () async {
                       final isProductAddedToCart = await Navigator.of(context)
                           .push<bool>(
-                            CupertinoPageRoute(
-                              builder: (context) => ProductDetail(
+                            PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => ProductDetail(
                                 produtoSelecionado: produtos?.elementAt(
                                   elementoAtualDoForLoop,
                                 ),
                               ),
+                              transitionDuration: Duration.zero,
+                              transitionsBuilder:
+                                  (
+                                    context,
+                                    animation,
+                                    secondaryAnimation,
+                                    child,
+                                  ) => child,
                             ),
                           );
                       if (context.mounted &&
@@ -83,8 +96,17 @@ class _HomePageState extends State<HomePage> {
                                     ).clearSnackBars();
                                     Navigator.push(
                                       context,
-                                      CupertinoPageRoute(
-                                        builder: (context) => ShoppingCart(),
+                                      PageRouteBuilder(
+                                        pageBuilder: (_, __, ___) =>
+                                            ShoppingCart(),
+                                        transitionDuration: Duration.zero,
+                                        transitionsBuilder:
+                                            (
+                                              context,
+                                              animation,
+                                              secondaryAnimation,
+                                              child,
+                                            ) => child,
                                       ),
                                     );
                                   },
